@@ -411,7 +411,13 @@
 
 <!-- 인트로 -->
 <div class="intro-box" id="intro">
-  <h1>🌱 꾸리와 남양이의 청렴 방탈출</h1>
+  <h1>🌱 꾸리와 남양이의 방탈출 어드벤처</h1>
+<br>
+<h2 style="font-size: 1.4rem; margin-top: 10px; font-weight: normal; color: #333; font-style: italic;">
+  조직 내에 숨겨진 <span style="color: #007BFF; font-weight: bold;">관행의 미로</span>,
+  <span style="color: #28a745; font-weight: bold;">청렴의 열쇠</span>를 찾아라!
+</h2>
+ <br>
   <p>행복한 교육을 꿈꾸는 개구리 <strong>꾸리</strong>와 낭만 가득한 양 <strong>남양이</strong>는<br>
   오늘도 배움과 성장을 향해 함께 나아가고 있어요.</p>
   <p>하지만 이들이 발을 들인 회사 안에는<br>
@@ -441,7 +447,7 @@
     <li>3️⃣ <strong>청렴의 방</strong>: 우리 모두가 만드는 청렴 문화의 완성</li>
   </ul>
   <div class="button-container">
-    <button class="button" id="startBtn">🚪 청렴 방탈출 시작하기</button>
+    <button class="button" id="startBtn">🚪 어드벤처 시작하기</button>
   </div>
 </div>
 
@@ -563,7 +569,7 @@
   </div>
 
   <div class="button-container">
-    <button class="button hidden" id="toNextBtn">✅ 다음 방으로 이동</button>
+    <button class="button hidden" id="toNextBtn">➡️ 다음 방으로 이동</button>
   </div>
 </div>
 
@@ -858,7 +864,10 @@ document.getElementById('toNextBtn').addEventListener('click', () => {
  <h2 style='text-align:center;'>📝 청렴 선언서 </h2>
   <div class='input-group'>
     <label>🙋‍♂️ 이름: <input type='text' id='userName' placeholder='홍길동'></label><br>
-    <label>🏢 소속: <input type='text' id='userDept' placeholder='구리남양주교육지원청'></label>
+    <label>🏢 소속: <input type='text' id='userDept' placeholder='구리남양주교육지원청'></label><br>
+<label>📝 나의 청렴 다짐: <br>
+<textarea id='userPledgeText' rows='4' style="width:80%; font-size:16px; font-family: 'Noto Sans KR', sans-serif;" placeholder='예: 나는 청렴한 조직 문화를 위해 노력하겠습니다.'></textarea>
+
   </div>
 
   <p style='text-align:center'><strong>✍️ 아래에 마우스로 서명해 주세요:</strong></p>
@@ -878,6 +887,7 @@ document.getElementById('toNextBtn').addEventListener('click', () => {
       나는 공정하고 투명한 업무 수행을 다짐하며,<br>
       조직 내 청렴 문화를 스스로 실천할 것을 선언합니다.
     </p>
+<div id="pledgeText" style="margin-top: 20px; font-size: 17px; font-style: italic;"></div>
     <img id='signImage' src=''>
     <p id='certInfo'>📍 <span id='certDept'>________</span> / <span id='certName'>________</span></p>
     <p id='todayDate'></p>
@@ -904,6 +914,8 @@ canvas.addEventListener('mousemove',e=>{
 });
 function clearSignature(){ctx.clearRect(0,0,canvas.width,canvas.height);}
 function generateCertificate(){
+   const pledge = document.getElementById('userPledgeText').value.trim();
+ document.getElementById('pledgeText').innerText = pledge ? `💬 나의 청렴 다짐: "${pledge}"` : '';
   const name=document.getElementById('userName').value||'________';
   const dept=document.getElementById('userDept').value||'________';
   document.getElementById('certName').textContent=name;
@@ -918,6 +930,11 @@ function generateCertificate(){
     cert.scrollIntoView({behavior:'smooth',block:'center'});
   }
 }
+
+
+
+
+
 function saveAsImage(){
   html2canvas(document.getElementById('certificateArea'),{scale:2,useCORS:true,backgroundColor:null})
     .then(canvas=>{const a=document.createElement('a');a.download='청렴_선언서.png';a.href=canvas.toDataURL('image/png');a.click();});
@@ -974,5 +991,3 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </body>
 </html>
-
-
