@@ -403,9 +403,6 @@
   font-size: 24px;
   cursor: pointer;
 }
-#signCanvas {
-  touch-action: none; /* 모바일에서 스크롤 대신 서명이 가능하게 함 */
-}
 
 
 </style>
@@ -499,7 +496,7 @@
 
 <!-- 🔐 갑질 금고 -->
 <div class="intro-box hidden" id="quizStage">
-  <h2> 갑질 금고</h2>
+  <h2> 🔐 갑질 금고</h2>
   <p>꾸리와 남양이는 술을 강요하는 어색한 분위기 속에서 탈출할 실마리를 찾고 있어요.<br>
   청렴한 문화를 만들기 위해 지금 이 상황들이 <strong>갑질인지 아닌지</strong> 판단해보자!</p>
 
@@ -519,12 +516,12 @@
   <div class="glass-container" id="glassContainer"></div>
 
   <div class="zone-box" id="dropZone">
-    <div class="zone-title">📦 갑질 금고</div>
+    <div class="zone-title">🔐  갑질 금고</div>
     <div class="zone-content" id="zoneContent"></div>
   </div>
 
   <div class="button-container" style="justify-content: center;">
-    <button class="button hidden" id="nextStageBtn">➡️ 다음 방으로 이동</button>
+    <button class="button hidden" id="nextStageBtn">👉  다음 방으로 이동</button>
   </div>
 </div>
 
@@ -572,7 +569,7 @@
   </div>
 
   <div class="button-container">
-    <button class="button hidden" id="toNextBtn">➡️ 다음 방으로 이동</button>
+    <button class="button hidden" id="toNextBtn">👉  다음 방으로 이동</button>
   </div>
 </div>
 
@@ -901,6 +898,7 @@ document.getElementById('toNextBtn').addEventListener('click', () => {
 
   <div id='saveBtnWrap' class='hidden' style='text-align:center;margin-top:20px;'>
     <button onclick='saveAsImage()'>💾 이미지 저장</button>
+    <button onclick="openGoogleFormWithPrefill()">📤 제출하기 </button>
   </div>
 
 <script>
@@ -934,14 +932,45 @@ function generateCertificate(){
   }
 }
 
-
-
-
-
-function saveAsImage(){
-  html2canvas(document.getElementById('certificateArea'),{scale:2,useCORS:true,backgroundColor:null})
-    .then(canvas=>{const a=document.createElement('a');a.download='청렴_선언서.png';a.href=canvas.toDataURL('image/png');a.click();});
+// 파일명에 쓸 날짜 형식 함수
+function formatDateYMD(d = new Date()) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
+// 파일명 안전 문자 처리
+function sanitizeFilename(text) {
+  return (text || '')
+    .replace(/[\\/:*?"<>|]/g, '')   // 금지 문자 제거
+    .replace(/\s+/g, '_')           // 공백 → _
+    .slice(0, 60);                  // 너무 길면 자르기
+}
+
+function saveAsImage() {
+  const target = document.getElementById('certificateArea');
+  if (!target) {
+    alert('선언서 영역을 찾을 수 없습니다.');
+    return;
+  }
+
+  // 이름 입력값
+  const nameFromInput = (document.getElementById('userName')?.value || '').trim();
+  const safeName = sanitizeFilename(nameFromInput || '이름없음');
+
+  // 최종 파일명: 청렴선언서_이름.png
+  const fileBase = `청렴선언서_${safeName}`;
+
+  html2canvas(target, { scale: 2, useCORS: true, backgroundColor: '#fff' })
+    .then(canvas => {
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = `${fileBase}.png`;
+      a.click();
+    });
+}
+
+
 </script>
 <script>
   document.getElementById('toDeclarationBtn').addEventListener('click', () => {
@@ -989,74 +1018,39 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('certificateStage').scrollIntoView({ behavior: 'smooth' });
   });
 });
+</script>
+<script>
+const FORM_BASE =
+  "https://docs.google.com/forms/d/e/1FAIpQLSdE2FTyqqT4qRmR7j0_zOAeVn1QyNLA_De_cVZne8zX68jypA/viewform";
 
+const ENTRY = {
+  name:   "entry.1945858841", // 이름
+  dept:   "entry.1570254882", // 소속
+  pledge: "entry.1057112149"  // 나의 청렴 다짐
+};
 
-// ===== 서명 기능 추가 =====
-const canvas = document.getElementById('signCanvas');
-const ctx = canvas.getContext('2d');
-let drawing = false;
+function openGoogleFormWithPrefill() {
+  const name   = (document.getElementById('userName')?.value || '').trim();
+  const dept   = (document.getElementById('userDept')?.value || '').trim();
+  const pledge = (document.getElementById('userPledgeText')?.value || '').trim();
 
-function getPosition(e) {
-  const rect = canvas.getBoundingClientRect();
-  if (e.touches && e.touches.length > 0) {
-    return {
-      x: e.touches[0].clientX - rect.left,
-      y: e.touches[0].clientY - rect.top
-    };
-  } else {
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    };
-  }
+  if (!name)   return alert('이름을 입력해 주세요.');
+  if (!dept)   return alert('소속을 입력해 주세요.');
+  if (!pledge) return alert('나의 청렴 다짐을 입력해 주세요.');
+
+  // URLSearchParams가 자동으로 올바른 인코딩 처리
+  const params = new URLSearchParams({
+    usp: "pp_url",
+    [ENTRY.name]:   name,
+    [ENTRY.dept]:   dept,
+    [ENTRY.pledge]: pledge
+  });
+
+  // 새 창으로 폼 열기(모바일 친화)
+  window.open(`${FORM_BASE}?${params.toString()}`, "_blank", "noopener,noreferrer");
 }
-
-function startDraw(e) {
-  e.preventDefault();
-  drawing = true;
-  ctx.beginPath();
-  const pos = getPosition(e);
-  ctx.moveTo(pos.x, pos.y);
-}
-
-function draw(e) {
-  if (!drawing) return;
-  e.preventDefault();
-  const pos = getPosition(e);
-  ctx.lineTo(pos.x, pos.y);
-  ctx.stroke();
-}
-
-function endDraw(e) {
-  if (!drawing) return;
-  drawing = false;
-  ctx.closePath();
-}
-
-// 마우스 이벤트
-canvas.addEventListener('mousedown', startDraw);
-canvas.addEventListener('mousemove', draw);
-canvas.addEventListener('mouseup', endDraw);
-canvas.addEventListener('mouseout', endDraw);
-
-// 터치 이벤트
-canvas.addEventListener('touchstart', startDraw);
-canvas.addEventListener('touchmove', draw);
-canvas.addEventListener('touchend', endDraw);
-canvas.addEventListener('touchcancel', endDraw);
-
-// 서명 지우기 함수 (기존 버튼에서 호출)
-function clearSignature() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-
-
-
-
 </script>
 
 
 </body>
 </html>
-
