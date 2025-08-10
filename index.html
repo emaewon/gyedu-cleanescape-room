@@ -411,13 +411,7 @@
 
 <!-- 인트로 -->
 <div class="intro-box" id="intro">
-  <h1>🌱 꾸리와 남양이의 방탈출 어드벤처</h1>
-<br>
-<h2 style="font-size: 1.4rem; margin-top: 10px; font-weight: normal; color: #333; font-style: italic;">
-  조직 내에 숨겨진 <span style="color: #007BFF; font-weight: bold;">관행의 미로</span>,
-  <span style="color: #28a745; font-weight: bold;">청렴의 열쇠</span>를 찾아라!
-</h2>
- <br>
+  <h1>🌱 꾸리와 남양이의 청렴 방탈출</h1>
   <p>행복한 교육을 꿈꾸는 개구리 <strong>꾸리</strong>와 낭만 가득한 양 <strong>남양이</strong>는<br>
   오늘도 배움과 성장을 향해 함께 나아가고 있어요.</p>
   <p>하지만 이들이 발을 들인 회사 안에는<br>
@@ -447,7 +441,7 @@
     <li>3️⃣ <strong>청렴의 방</strong>: 우리 모두가 만드는 청렴 문화의 완성</li>
   </ul>
   <div class="button-container">
-    <button class="button" id="startBtn">🚪 어드벤처 시작하기</button>
+    <button class="button" id="startBtn">🚪 청렴 방탈출 시작하기</button>
   </div>
 </div>
 
@@ -496,7 +490,7 @@
 
 <!-- 🔐 갑질 금고 -->
 <div class="intro-box hidden" id="quizStage">
-  <h2> 🔐 갑질 금고</h2>
+  <h2> 갑질 금고</h2>
   <p>꾸리와 남양이는 술을 강요하는 어색한 분위기 속에서 탈출할 실마리를 찾고 있어요.<br>
   청렴한 문화를 만들기 위해 지금 이 상황들이 <strong>갑질인지 아닌지</strong> 판단해보자!</p>
 
@@ -516,12 +510,12 @@
   <div class="glass-container" id="glassContainer"></div>
 
   <div class="zone-box" id="dropZone">
-    <div class="zone-title">🔐  갑질 금고</div>
+    <div class="zone-title">📦 갑질 금고</div>
     <div class="zone-content" id="zoneContent"></div>
   </div>
 
   <div class="button-container" style="justify-content: center;">
-    <button class="button hidden" id="nextStageBtn">👉  다음 방으로 이동</button>
+    <button class="button hidden" id="nextStageBtn">➡️ 다음 방으로 이동</button>
   </div>
 </div>
 
@@ -569,7 +563,7 @@
   </div>
 
   <div class="button-container">
-    <button class="button hidden" id="toNextBtn">👉  다음 방으로 이동</button>
+    <button class="button hidden" id="toNextBtn">✅ 다음 방으로 이동</button>
   </div>
 </div>
 
@@ -864,10 +858,7 @@ document.getElementById('toNextBtn').addEventListener('click', () => {
  <h2 style='text-align:center;'>📝 청렴 선언서 </h2>
   <div class='input-group'>
     <label>🙋‍♂️ 이름: <input type='text' id='userName' placeholder='홍길동'></label><br>
-    <label>🏢 소속: <input type='text' id='userDept' placeholder='구리남양주교육지원청'></label><br>
-<label>📝 나의 청렴 다짐: <br>
-<textarea id='userPledgeText' rows='4' style="width:80%; font-size:16px; font-family: 'Noto Sans KR', sans-serif;" placeholder='예: 나는 청렴한 조직 문화를 위해 노력하겠습니다.'></textarea>
-
+    <label>🏢 소속: <input type='text' id='userDept' placeholder='구리남양주교육지원청'></label>
   </div>
 
   <p style='text-align:center'><strong>✍️ 아래에 마우스로 서명해 주세요:</strong></p>
@@ -887,7 +878,6 @@ document.getElementById('toNextBtn').addEventListener('click', () => {
       나는 공정하고 투명한 업무 수행을 다짐하며,<br>
       조직 내 청렴 문화를 스스로 실천할 것을 선언합니다.
     </p>
-<div id="pledgeText" style="margin-top: 20px; font-size: 17px; font-style: italic;"></div>
     <img id='signImage' src=''>
     <p id='certInfo'>📍 <span id='certDept'>________</span> / <span id='certName'>________</span></p>
     <p id='todayDate'></p>
@@ -898,7 +888,6 @@ document.getElementById('toNextBtn').addEventListener('click', () => {
 
   <div id='saveBtnWrap' class='hidden' style='text-align:center;margin-top:20px;'>
     <button onclick='saveAsImage()'>💾 이미지 저장</button>
-    <button onclick="openGoogleFormWithPrefill()">📤 제출하기 </button>
   </div>
 
 <script>
@@ -915,8 +904,6 @@ canvas.addEventListener('mousemove',e=>{
 });
 function clearSignature(){ctx.clearRect(0,0,canvas.width,canvas.height);}
 function generateCertificate(){
-   const pledge = document.getElementById('userPledgeText').value.trim();
- document.getElementById('pledgeText').innerText = pledge ? `💬 나의 청렴 다짐: "${pledge}"` : '';
   const name=document.getElementById('userName').value||'________';
   const dept=document.getElementById('userDept').value||'________';
   document.getElementById('certName').textContent=name;
@@ -931,46 +918,10 @@ function generateCertificate(){
     cert.scrollIntoView({behavior:'smooth',block:'center'});
   }
 }
-
-// 파일명에 쓸 날짜 형식 함수
-function formatDateYMD(d = new Date()) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+function saveAsImage(){
+  html2canvas(document.getElementById('certificateArea'),{scale:2,useCORS:true,backgroundColor:null})
+    .then(canvas=>{const a=document.createElement('a');a.download='청렴_선언서.png';a.href=canvas.toDataURL('image/png');a.click();});
 }
-// 파일명 안전 문자 처리
-function sanitizeFilename(text) {
-  return (text || '')
-    .replace(/[\\/:*?"<>|]/g, '')   // 금지 문자 제거
-    .replace(/\s+/g, '_')           // 공백 → _
-    .slice(0, 60);                  // 너무 길면 자르기
-}
-
-function saveAsImage() {
-  const target = document.getElementById('certificateArea');
-  if (!target) {
-    alert('선언서 영역을 찾을 수 없습니다.');
-    return;
-  }
-
-  // 이름 입력값
-  const nameFromInput = (document.getElementById('userName')?.value || '').trim();
-  const safeName = sanitizeFilename(nameFromInput || '이름없음');
-
-  // 최종 파일명: 청렴선언서_이름.png
-  const fileBase = `청렴선언서_${safeName}`;
-
-  html2canvas(target, { scale: 2, useCORS: true, backgroundColor: '#fff' })
-    .then(canvas => {
-      const a = document.createElement('a');
-      a.href = canvas.toDataURL('image/png');
-      a.download = `${fileBase}.png`;
-      a.click();
-    });
-}
-
-
 </script>
 <script>
   document.getElementById('toDeclarationBtn').addEventListener('click', () => {
@@ -1019,38 +970,9 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 </script>
-<script>
-const FORM_BASE =
-  "https://docs.google.com/forms/d/e/1FAIpQLSdE2FTyqqT4qRmR7j0_zOAeVn1QyNLA_De_cVZne8zX68jypA/viewform";
-
-const ENTRY = {
-  name:   "entry.1945858841", // 이름
-  dept:   "entry.1570254882", // 소속
-  pledge: "entry.1057112149"  // 나의 청렴 다짐
-};
-
-function openGoogleFormWithPrefill() {
-  const name   = (document.getElementById('userName')?.value || '').trim();
-  const dept   = (document.getElementById('userDept')?.value || '').trim();
-  const pledge = (document.getElementById('userPledgeText')?.value || '').trim();
-
-  if (!name)   return alert('이름을 입력해 주세요.');
-  if (!dept)   return alert('소속을 입력해 주세요.');
-  if (!pledge) return alert('나의 청렴 다짐을 입력해 주세요.');
-
-  // URLSearchParams가 자동으로 올바른 인코딩 처리
-  const params = new URLSearchParams({
-    usp: "pp_url",
-    [ENTRY.name]:   name,
-    [ENTRY.dept]:   dept,
-    [ENTRY.pledge]: pledge
-  });
-
-  // 새 창으로 폼 열기(모바일 친화)
-  window.open(`${FORM_BASE}?${params.toString()}`, "_blank", "noopener,noreferrer");
-}
-</script>
 
 
 </body>
 </html>
+
+
