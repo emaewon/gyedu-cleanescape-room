@@ -403,6 +403,9 @@
   font-size: 24px;
   cursor: pointer;
 }
+#signCanvas {
+  touch-action: none; /* 모바일에서 스크롤 대신 서명이 가능하게 함 */
+}
 
 
 </style>
@@ -986,8 +989,74 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('certificateStage').scrollIntoView({ behavior: 'smooth' });
   });
 });
+
+
+// ===== 서명 기능 추가 =====
+const canvas = document.getElementById('signCanvas');
+const ctx = canvas.getContext('2d');
+let drawing = false;
+
+function getPosition(e) {
+  const rect = canvas.getBoundingClientRect();
+  if (e.touches && e.touches.length > 0) {
+    return {
+      x: e.touches[0].clientX - rect.left,
+      y: e.touches[0].clientY - rect.top
+    };
+  } else {
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  }
+}
+
+function startDraw(e) {
+  e.preventDefault();
+  drawing = true;
+  ctx.beginPath();
+  const pos = getPosition(e);
+  ctx.moveTo(pos.x, pos.y);
+}
+
+function draw(e) {
+  if (!drawing) return;
+  e.preventDefault();
+  const pos = getPosition(e);
+  ctx.lineTo(pos.x, pos.y);
+  ctx.stroke();
+}
+
+function endDraw(e) {
+  if (!drawing) return;
+  drawing = false;
+  ctx.closePath();
+}
+
+// 마우스 이벤트
+canvas.addEventListener('mousedown', startDraw);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', endDraw);
+canvas.addEventListener('mouseout', endDraw);
+
+// 터치 이벤트
+canvas.addEventListener('touchstart', startDraw);
+canvas.addEventListener('touchmove', draw);
+canvas.addEventListener('touchend', endDraw);
+canvas.addEventListener('touchcancel', endDraw);
+
+// 서명 지우기 함수 (기존 버튼에서 호출)
+function clearSignature() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+
+
+
+
 </script>
 
 
 </body>
 </html>
+
