@@ -700,6 +700,76 @@
     }
   });
 
+let touchGlass = null;
+let originalParent = null;
+
+document.addEventListener('touchstart', e => {
+  const target = e.target.closest('.soju-glass');
+  if (target) {
+    touchGlass = target;
+    originalParent = target.parentElement;
+    target.style.position = 'absolute';
+    target.style.zIndex = 1000;
+  }
+});
+
+document.addEventListener('touchmove', e => {
+  if (touchGlass) {
+    const touch = e.touches[0];
+    touchGlass.style.left = touch.pageX - touchGlass.offsetWidth / 2 + 'px';
+    touchGlass.style.top = touch.pageY - touchGlass.offsetHeight / 2 + 'px';
+  }
+});
+
+document.addEventListener('touchend', e => {
+  if (touchGlass) {
+    const dropZoneRect = dropZone.getBoundingClientRect();
+    const touch = e.changedTouches[0];
+    if (
+      touch.pageX > dropZoneRect.left &&
+      touch.pageX < dropZoneRect.right &&
+      touch.pageY > dropZoneRect.top &&
+      touch.pageY < dropZoneRect.bottom
+    ) {
+      // drop 로직 재사용
+      const isCorrect = touchGlass.dataset.answer === "true";
+      if (isCorrect) {
+        if (!zoneContent.contains(touchGlass.parentElement)) {
+          zoneContent.appendChild(touchGlass.parentElement);
+          const correctGlasses = zoneContent.querySelectorAll('.glass-wrap');
+          if (correctGlasses.length >= 3 && !document.getElementById('seal')) {
+            const seal = document.createElement('div');
+            seal.className = 'seal';
+            seal.id = 'seal';
+            seal.textContent = '봉인!';
+            seal.onclick = () => {
+              nextBtn.classList.remove('hidden');
+              seal.remove();
+            };
+            dropZone.appendChild(seal);
+          }
+        }
+      } else {
+        touchGlass.style.left = '';
+        touchGlass.style.top = '';
+        originalParent.appendChild(touchGlass);
+      }
+    } else {
+      // 드롭 실패 → 원위치
+      touchGlass.style.left = '';
+      touchGlass.style.top = '';
+      originalParent.appendChild(touchGlass);
+    }
+    touchGlass.style.position = '';
+    touchGlass.style.zIndex = '';
+    touchGlass = null;
+  }
+});
+
+
+
+
+
   // 다음 버튼 클릭 → 관행의 방
   nextBtn.addEventListener('click', () => {
     document.getElementById('quizStage').classList.add('hidden');
@@ -1021,12 +1091,12 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 <script>
 const FORM_BASE =
-  "https://docs.google.com/forms/d/e/1FAIpQLSdE2FTyqqT4qRmR7j0_zOAeVn1QyNLA_De_cVZne8zX68jypA/viewform";
+  "https://docs.google.com/forms/d/e/1FAIpQLSeJkHl3RJ3_7BHgM31jlgEJ0d-QtLSjuo2FrFrRm97Ezq1XcQ/viewform";
 
 const ENTRY = {
-  name:   "entry.1945858841", // 이름
-  dept:   "entry.1570254882", // 소속
-  pledge: "entry.1057112149"  // 나의 청렴 다짐
+  name:   "entry.884016295",   // 이름
+  dept:   "entry.770862256",   // 소속
+  pledge: "entry.1362716704"   // 나의 청렴 다짐
 };
 
 function openGoogleFormWithPrefill() {
@@ -1038,7 +1108,7 @@ function openGoogleFormWithPrefill() {
   if (!dept)   return alert('소속을 입력해 주세요.');
   if (!pledge) return alert('나의 청렴 다짐을 입력해 주세요.');
 
-  // URLSearchParams가 자동으로 올바른 인코딩 처리
+  // 자동 인코딩
   const params = new URLSearchParams({
     usp: "pp_url",
     [ENTRY.name]:   name,
@@ -1046,14 +1116,10 @@ function openGoogleFormWithPrefill() {
     [ENTRY.pledge]: pledge
   });
 
-  // 새 창으로 폼 열기(모바일 친화)
   window.open(`${FORM_BASE}?${params.toString()}`, "_blank", "noopener,noreferrer");
 }
 </script>
 
-
 </body>
 </html>
-
-
 
