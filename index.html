@@ -221,6 +221,8 @@
     50% { transform: scale(1.2); opacity: 1; }
   }
 
+.soju-glass, #dropZone { touch-action: none; }
+
   /* 전화 메시지 및 말풍선 스타일 */
   .phone-display {
     font-size: 4rem;
@@ -703,69 +705,73 @@
 let touchGlass = null;
 let originalParent = null;
 
-document.addEventListener('touchstart', e => {
+function onTouchStart(e) {
   const target = e.target.closest('.soju-glass');
-  if (target) {
-    touchGlass = target;
-    originalParent = target.parentElement;
-    target.style.position = 'absolute';
-    target.style.zIndex = 1000;
-  }
-});
+  if (!target) return;
+  e.preventDefault();
 
-document.addEventListener('touchmove', e => {
-  if (touchGlass) {
-    const touch = e.touches[0];
-    touchGlass.style.left = touch.pageX - touchGlass.offsetWidth / 2 + 'px';
-    touchGlass.style.top = touch.pageY - touchGlass.offsetHeight / 2 + 'px';
-  }
-});
+  touchGlass = target;
+  originalParent = target.parentElement;
+  target.style.position = 'absolute';
+  target.style.zIndex = 1000;
+}
 
-document.addEventListener('touchend', e => {
-  if (touchGlass) {
-    const dropZoneRect = dropZone.getBoundingClientRect();
-    const touch = e.changedTouches[0];
-    if (
-      touch.pageX > dropZoneRect.left &&
-      touch.pageX < dropZoneRect.right &&
-      touch.pageY > dropZoneRect.top &&
-      touch.pageY < dropZoneRect.bottom
-    ) {
-      // drop 로직 재사용
-      const isCorrect = touchGlass.dataset.answer === "true";
-      if (isCorrect) {
-        if (!zoneContent.contains(touchGlass.parentElement)) {
-          zoneContent.appendChild(touchGlass.parentElement);
-          const correctGlasses = zoneContent.querySelectorAll('.glass-wrap');
-          if (correctGlasses.length >= 3 && !document.getElementById('seal')) {
-            const seal = document.createElement('div');
-            seal.className = 'seal';
-            seal.id = 'seal';
-            seal.textContent = '봉인!';
-            seal.onclick = () => {
-              nextBtn.classList.remove('hidden');
-              seal.remove();
-            };
-            dropZone.appendChild(seal);
-          }
+function onTouchMove(e) {
+  if (!touchGlass) return;
+  e.preventDefault();
+
+  const t = e.touches[0];
+  const x = t.clientX;
+  const y = t.clientY;
+
+  // 화면(client) 좌표 + 스크롤 보정값으로 배치
+  touchGlass.style.left = (x - touchGlass.offsetWidth  / 2 + window.scrollX) + 'px';
+  touchGlass.style.top  = (y - touchGlass.offsetHeight / 2 + window.scrollY) + 'px';
+}
+
+function onTouchEnd(e) {
+  if (!touchGlass) return;
+  e.preventDefault();
+
+  const rect = dropZone.getBoundingClientRect();
+  const t = e.changedTouches[0];
+  const x = t.clientX;
+  const y = t.clientY;
+
+  const inside = x > rect.left && x < rect.right && y > rect.top && y < rect.bottom;
+
+  if (inside) {
+    const isCorrect = touchGlass.dataset.answer === "true";
+    if (isCorrect) {
+      if (!zoneContent.contains(touchGlass.parentElement)) {
+        zoneContent.appendChild(touchGlass.parentElement);
+        const correctGlasses = zoneContent.querySelectorAll('.glass-wrap');
+        if (correctGlasses.length >= 3 && !document.getElementById('seal')) {
+          const seal = document.createElement('div');
+          seal.className = 'seal';
+          seal.id = 'seal';
+          seal.textContent = '봉인!';
+          seal.onclick = () => { nextBtn.classList.remove('hidden'); seal.remove(); };
+          dropZone.appendChild(seal);
         }
-      } else {
-        touchGlass.style.left = '';
-        touchGlass.style.top = '';
-        originalParent.appendChild(touchGlass);
       }
     } else {
-      // 드롭 실패 → 원위치
       touchGlass.style.left = '';
-      touchGlass.style.top = '';
+      touchGlass.style.top  = '';
       originalParent.appendChild(touchGlass);
     }
-    touchGlass.style.position = '';
-    touchGlass.style.zIndex = '';
-    touchGlass = null;
+  } else {
+    // 드롭 실패 → 원위치
+    touchGlass.style.left = '';
+    touchGlass.style.top  = '';
+    originalParent.appendChild(touchGlass);
   }
-});
 
+  // 공통 정리
+  touchGlass.style.position = '';
+  touchGlass.style.zIndex = '';
+  touchGlass = null;
+}
 
 
 
@@ -1122,4 +1128,5 @@ function openGoogleFormWithPrefill() {
 
 </body>
 </html>
+
 
